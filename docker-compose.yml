@@ -17,7 +17,7 @@ services:
       - frontend
     labels:
       - traefik.enable=true
-      - traefik.http.routers.wpsviluppo-plugin.rule=Host(`wp-${DOMAIN}`)
+      - traefik.http.routers.wpsviluppo-plugin.rule=Host(`${DOMAIN}`)
       - traefik.http.routers.wpsviluppo-plugin.tls=true
       - traefik.http.routers.wpsviluppo-plugin.tls.certresolver=cloudflare
       - traefik.http.routers.wpsviluppo-plugin.entrypoints=websecure
@@ -36,7 +36,7 @@ services:
       - frontend
     labels:
       - traefik.enable=true
-      - traefik.http.routers.pmasviluppo-plugin.rule=Host(`pma-${DOMAIN}`)
+      - traefik.http.routers.pmasviluppo-plugin.rule=Host(`pma${DOMAIN}`)
       - traefik.http.routers.pmasviluppo-plugin.tls=true
       - traefik.http.routers.pmasviluppo-plugin.tls.certresolver=cloudflare
       - traefik.http.routers.pmasviluppo-plugin.entrypoints=websecure
@@ -57,7 +57,7 @@ services:
       - frontend
     labels:
       - traefik.enable=true
-      - traefik.http.routers.dbsviluppo-plugin.rule=Host(`db-${DOMAIN}`)
+      - traefik.http.routers.dbsviluppo-plugin.rule=Host(`db${DOMAIN}`)
       - traefik.http.routers.dbsviluppo-plugin.tls=true
       - traefik.http.routers.dbsviluppo-plugin.tls.certresolver=cloudflare
       - traefik.http.routers.dbsviluppo-plugin.entrypoints=websecure
