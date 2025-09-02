@@ -2,12 +2,10 @@ version: '3'
 
 services:
   wp:
-    image: wordpress:latest # https://hub.docker.com/_/wordpress/
+    image: wordpress:latest
     volumes:
       - ./config/wp_php.ini:/usr/local/etc/php/conf.d/conf.ini
-      - ./wp-app:/var/www/html # Full wordpress project
-      #- ./plugin-name/trunk/:/var/www/html/wp-content/plugins/plugin-name # Plugin development
-      #- ./theme-name/trunk/:/var/www/html/wp-content/themes/theme-name # Theme development
+      - ./wp-app:/var/www/html
     environment:
       WORDPRESS_DB_HOST: db
       WORDPRESS_DB_NAME: "${DB_NAME}"
@@ -15,42 +13,36 @@ services:
       WORDPRESS_DB_PASSWORD: "${DB_ROOT_PASSWORD}"
     depends_on:
       - db
-    links:
-      - db
     networks:
       - frontend
     labels:
       - traefik.enable=true
-      - traefik.http.routers.wpsviluppo-plugin.rule=Host(`wp.dominio.it`)
+      - traefik.http.routers.wpsviluppo-plugin.rule=Host(`wp-${DOMAIN}`)
       - traefik.http.routers.wpsviluppo-plugin.tls=true
       - traefik.http.routers.wpsviluppo-plugin.tls.certresolver=cloudflare
       - traefik.http.routers.wpsviluppo-plugin.entrypoints=websecure
 
   pma:
-    image: phpmyadmin:latest  # https://hub.docker.com/_/phpmyadmin
+    image: phpmyadmin:latest
     environment:
-      # https://docs.phpmyadmin.net/en/latest/setup.html#docker-environment-variables
       PMA_HOST: db
       PMA_PORT: 3306
       MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASSWORD}"
       UPLOAD_LIMIT: 50M
-    links:
-      - db:db
     volumes:
-     - ./config/pma_php.ini:/usr/local/etc/php/conf.d/conf.ini
-     - ./config/pma_config.php:/etc/phpmyadmin/config.user.inc.php
+      - ./config/pma_php.ini:/usr/local/etc/php/conf.d/conf.ini
+      - ./config/pma_config.php:/etc/phpmyadmin/config.user.inc.php
     networks:
       - frontend
     labels:
       - traefik.enable=true
-      - traefik.http.routers.pmasviluppo-plugin.rule=Host(`pma.dominio.it`)
+      - traefik.http.routers.pmasviluppo-plugin.rule=Host(`pma-${DOMAIN}`)
       - traefik.http.routers.pmasviluppo-plugin.tls=true
       - traefik.http.routers.pmasviluppo-plugin.tls.certresolver=cloudflare
       - traefik.http.routers.pmasviluppo-plugin.entrypoints=websecure
 
   db:
-    image: mysql:latest # https://hub.docker.com/_/mysql/ - or mariadb https://hub.docker.com/_/mariadb
-    # platform: linux/x86_64  # Uncomment if your machine is running on arm (ex: Apple Silicon processor)
+    image: mysql:latest
     command: [
         '--character-set-server=utf8mb4',
         '--collation-server=utf8mb4_unicode_ci'
@@ -65,7 +57,7 @@ services:
       - frontend
     labels:
       - traefik.enable=true
-      - traefik.http.routers.dbsviluppo-plugin.rule=Host(`db.dominio.it`)
+      - traefik.http.routers.dbsviluppo-plugin.rule=Host(`db-${DOMAIN}`)
       - traefik.http.routers.dbsviluppo-plugin.tls=true
       - traefik.http.routers.dbsviluppo-plugin.tls.certresolver=cloudflare
       - traefik.http.routers.dbsviluppo-plugin.entrypoints=websecure
