@@ -12,14 +12,10 @@
   <a href="https://www.phpmyadmin.net/"><img src="https://img.shields.io/badge/phpMyAdmin-5.2-orange?logo=phpmyadmin&logoColor=white" alt="phpMyAdmin"></a>
 </p>
 
----
-
 ## 🧭 Description
 
-This project provides a **ready-to-use WordPress** environment in **Docker Compose**, compatible with **Traefik** as a reverse proxy.  
-It is designed for **self-hosted** environments that require **automatic HTTPS**, **DB management via phpMyAdmin**, and **modular scalability**.
-
----
+This project provides a **ready-to-use WordPress** environment powered by **Docker Compose**, designed to integrate seamlessly with **Traefik** as a reverse proxy.  
+It supports **automatic HTTPS certificates**, **phpMyAdmin database management**, and **modular scalability**.
 
 ## 🧱 Technology Stack
 
@@ -27,21 +23,17 @@ It is designed for **self-hosted** environments that require **automatic HTTPS**
 |-----------|-------------|
 | 🐬 **MariaDB** | Relational database for WordPress |
 | 🧭 **phpMyAdmin** | Web interface for database management |
-| 🐘 **PHP-FPM** | PHP interpreter for WordPress |
-| 🚀 **Nginx** | Lightweight, high-performance web server |
-| 🌍 **Traefik** | Reverse proxy with automatic SSL certificate management (external to compose) |
-
----
+| 🐘 **PHP-FPM (WordPress)** | PHP interpreter used by WordPress |
+| 🚀 **Nginx (within WordPress image)** | Lightweight, high-performance web server |
+| 🌍 **Traefik** | External reverse proxy handling SSL and routing |
 
 ## ⚙️ Requirements
 
-- **Docker** ≥ 24.x
-- **Docker Compose** ≥ 2.x
-- **External Traefik** Docker network (`frontend`) already configured
-- Domain and DNS correctly pointed to the server
-- (Optional) **Cloudflare** account configured for TLS automation  
-
----
+- **Docker** ≥ 24.x  
+- **Docker Compose** ≥ 2.x  
+- External Traefik Docker network (default: `frontend`) already created  
+- Domain names correctly pointing to your server  
+- (Optional) **Cloudflare** API credentials configured for certificate automation  
 
 ## 📁 Project Structure
 
@@ -51,129 +43,128 @@ It is designed for **self-hosted** environments that require **automatic HTTPS**
 ├── nginx/<br>
 │ └── default.conf<br>
 ├── site/<br>
-│ └── (WordPress or PHP file)<br>
+│ └── (WordPress core or custom files)<br>
 └── README.md<br>
-
-
----
 
 ## 🔧 Configuration
 
-1. Copy the sample file `.env.example` and rename it:
+1. Copy the example environment file and rename it:
 
 ```bash
-     cp .env.example .env
-   ```
+cp .env.example .env
+```
 
-Modify the variables in the .env file according to your needs:
+Edit .env and fill in your configuration:
 
 
 | Variable | Description |
 |-----------|-------------|
-| MYSQL_ROOT_PASSWORD | Root password for MariaDB |
-| MYSQL_DATABASE | WordPress database name |
-| MYSQL_USER | Database user |
-| MYSQL_PASSWORD | Database user password |
-| DOMAIN | WordPress domain |
-| DOMAIN_PMA | Traefik router for WordPress |
-| ROUTERS_WEB_TRAEFIK | Traefik router for WordPress |
-| ROUTERS_PMA_TRAEFIK | Traefik router for phpMyAdmin |
-| FRONTEND_NETWORK | External Traefik network name |
-| DB_VOLUME | Docker volume for the database |
+| MYSQL_ROOT_PASSWORD	| Root password for MariaDB
+| MYSQL_DATABASE	| Name of the WordPress database
+| MYSQL_USER	| WordPress database username
+| MYSQL_PASSWORD	| WordPress database user password
+| DOMAIN	| Your main WordPress domain (e.g. example.com)
+| DOMAIN_PMA	| Domain for phpMyAdmin (e.g. pma.example.com)
+| ROUTERS_WEB_TRAEFIK	| Traefik router name for WordPress
+| ROUTERS_PMA_TRAEFIK	| Traefik router name for phpMyAdmin
+| FRONTEND_NETWORK	| External Traefik network name (default: frontend)
+| DB_VOLUME	| Docker volume name for persistent MariaDB data
 
 ## 🚀 Quick Start
 
-1. Create the Traefik network (if it doesn't exist):
-
+Create the external Traefik network if it doesn’t exist:
 ```bash
-  docker network create frontend
+docker network create frontend
 ```
-
-
-2. Start the containers:
-
+Launch the stack:
 ```bash
-  docker compose up -d
+docker compose up -d
 ```
-
-3. Verify that everything is working:
-
+Check running containers:
 ```bash
-  docker ps
+docker ps
 ```
+Access your services:
 
-4. Access the services:
+🌐 WordPress: https://example.com
 
-🌐 WordPress / Nginx: https://test.domain.com
+🧭 phpMyAdmin: https://pma.example.com
 
-🧭 phpMyAdmin: https://testpma.domain.com
-
-(Replace the domains with those set in your .env)
+(Replace the domains with your actual .env values.)
 
 ## 🧰 Useful Commands
 
-# Stop containers
+### Stop containers
+```bash
+docker compose down
+```
 
-    docker compose down
+### Rebuild without cache
+```bash
+docker compose build --no-cache
+```
 
-# Rebuild images without cache
-
-    docker compose build --no-cache
-
-# Show logs in real time
-
-    docker compose logs -f
+### View logs in real-time
+```bash
+docker compose logs -f
+```
 
 ## 🪄 Customizations
 
 🧩 PHP
 
-  The php-fpm service is built from a local Dockerfile.
-  You can add PHP extensions, libraries, or modify PHP.ini settings.
+The wp service uses a PHP-FPM image.<br>
+You can customize PHP extensions or configuration via:
+
+./config/wp_php.ini
 
 ⚙️ Nginx
 
-  All configuration is in nginx/default.conf.
-  Here you can define rewrite rules, caching, gzip, security headers, etc.
+Custom configuration files can be placed under:
+
+nginx/default.conf
+
+Use it to set caching, compression, rewrite rules, or headers.
 
 🔐 Traefik
 
-  Not included in the project, but fully compatible.
-  Labels automatically configure routers, entry points, and SSL certificates:
+This stack is fully compatible with Traefik (external).<br>
+Labels automatically configure routers, entrypoints, and SSL:
 
-    labels:
-      - “traefik.enable=true”
-      - “traefik.http.routers.${ROUTERS_WEB_TRAEFIK}.rule=Host(`${DOMAIN}`)”
-      - “traefik.http.routers.${ROUTERS_WEB_TRAEFIK}.entrypoints=websecure”
-      - “traefik.http.routers.${ROUTERS_WEB_TRAEFIK}.tls=true”
-      - “traefik.http.routers.${ROUTERS_WEB_TRAEFIK}.tls.certresolver=cloudflare”
+```bash
+labels:
+  - "traefik.enable=true"
+  - "traefik.http.routers.${ROUTERS_WEB_TRAEFIK}.rule=Host(`${DOMAIN}`)"
+  - "traefik.http.routers.${ROUTERS_WEB_TRAEFIK}.entrypoints=websecure"
+  - "traefik.http.routers.${ROUTERS_WEB_TRAEFIK}.tls=true"
+  - "traefik.http.routers.${ROUTERS_WEB_TRAEFIK}.tls.certresolver=cloudflare"
+```
 
-## 🧩 Volumes & Network
+## 🧩 Volumes & Networks
 
 | Type | Name | Description |
 |-----------|-------------|-------------|
-| Volume | ${DB_VOLUME} | Persistent MariaDB data |
-| Network | ${FRONTEND_NETWORK} | Shared network with Traefik |
-
+| Volume	| ${DB_VOLUME}	| Persistent MariaDB data
+| Network	| ${FRONTEND_NETWORK}	E| xternal Traefik network (shared reverse proxy)
 
 ## 🔎 Troubleshooting
 
-| Problem | Possible solution |
+| Problem | Possible Solution |
 |-----------|-------------|
-| ❌ Domain not responding | Check DNS and Traefik configuration |
-| ⚠️ phpMyAdmin does not open | Check labels and DOMAIN_PMA domain |
-| 🧱 Permission error | Ensure that ./site has www-data permissions |
-| 🔄 SSL certificate not generated | Check tls.certresolver configuration and Cloudflare credentials |
+| ❌ Domain not responding	| Check DNS records and Traefik router configuration
+| ⚠️ phpMyAdmin not loading	| Ensure DOMAIN_PMA and Traefik labels are correct
+| 🧱 Permission denied	| Ensure ./site directory has www-data ownership
+| 🔄 SSL not generated	| Check certresolver configuration and Cloudflare credentials
 
 ## 🧑‍💻 Author
 
 Antonio Zarrilli
 
-📦 GitHub: Zarrilli-Antonio<br>
+📦 GitHub: Zarrilli-Antonio
 
 💡 Project: wordpress-traefik-compatible-docker-compose
 
 ## 🪪 License
 
-This project is distributed under the MIT license.<br>
-You can use it freely for personal or commercial projects.
+This project is distributed under the MIT License.<br>
+You may use it freely for personal or commercial projects.
