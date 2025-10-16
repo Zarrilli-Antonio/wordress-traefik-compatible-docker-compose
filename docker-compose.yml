@@ -17,10 +17,10 @@ services:
       - frontend
     labels:
       - traefik.enable=true
-      - traefik.http.routers.wpsviluppo-plugin.rule=Host(`${DOMAIN}`)
-      - traefik.http.routers.wpsviluppo-plugin.tls=true
-      - traefik.http.routers.wpsviluppo-plugin.tls.certresolver=cloudflare
-      - traefik.http.routers.wpsviluppo-plugin.entrypoints=websecure
+      - traefik.http.routers.${ROUTERS_WP_TRAEFIK}.rule=Host(`${DOMAIN}`)
+      - traefik.http.routers.${ROUTERS_WP_TRAEFIK}.tls=true
+      - traefik.http.routers.${ROUTERS_WP_TRAEFIK}.tls.certresolver=cloudflare
+      - traefik.http.routers.${ROUTERS_WP_TRAEFIK}.entrypoints=websecure
 
   pma:
     image: phpmyadmin:latest
@@ -36,10 +36,10 @@ services:
       - frontend
     labels:
       - traefik.enable=true
-      - traefik.http.routers.pmasviluppo-plugin.rule=Host(`pma${DOMAIN}`)
-      - traefik.http.routers.pmasviluppo-plugin.tls=true
-      - traefik.http.routers.pmasviluppo-plugin.tls.certresolver=cloudflare
-      - traefik.http.routers.pmasviluppo-plugin.entrypoints=websecure
+      - traefik.http.routers.${ROUTERS_PMA_TRAEFIK}.rule=Host(`pma${DOMAIN}`)
+      - traefik.http.routers.${ROUTERS_PMA_TRAEFIK}.tls=true
+      - traefik.http.routers.${ROUTERS_PMA_TRAEFIK}.tls.certresolver=cloudflare
+      - traefik.http.routers.${ROUTERS_PMA_TRAEFIK}.entrypoints=websecure
 
   db:
     image: mysql:latest
@@ -57,10 +57,10 @@ services:
       - frontend
     labels:
       - traefik.enable=true
-      - traefik.http.routers.dbsviluppo-plugin.rule=Host(`db${DOMAIN}`)
-      - traefik.http.routers.dbsviluppo-plugin.tls=true
-      - traefik.http.routers.dbsviluppo-plugin.tls.certresolver=cloudflare
-      - traefik.http.routers.dbsviluppo-plugin.entrypoints=websecure
+      - traefik.http.routers.${ROUTERS_DB_TRAEFIK}.rule=Host(`db${DOMAIN}`)
+      - traefik.http.routers.${ROUTERS_DB_TRAEFIK}.tls=true
+      - traefik.http.routers.${ROUTERS_DB_TRAEFIK}.tls.certresolver=cloudflare
+      - traefik.http.routers.${ROUTERS_DB_TRAEFIK}.entrypoints=websecure
 
 volumes:
   db_data:
